@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- Mapbox dependencies -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css' rel='stylesheet' />
+
+    <!-- Deck.gl dependency -->
+    <script src="https://unpkg.com/deck.gl@^8.0.0/dist.min.js"></script>
+
+    <!-- axios dependency -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+
+    <div id="map" style="width:100vw; height:100vh"></div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic2hpdmE2NSIsImEiOiJjbDJyamN6NnoyejkxM2ZvN3d2cHBuaTdvIn0.xWIl2m0q8i7HB-PuVuVWgQ';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/satellite-v9',
+            zoom: 13,
+            center: [-75.6703753, 4.532016],
+            pitch: 60,
+
+        });
+
+        map.on("load", () => {
+            loadData();
+        });
+
+        let loadData = async () => {
+            let buildingData = (await axios.get("map.geojson")).data;
+            console.log(buildingData)
+            const myDeckLayer = new deck.MapboxLayer({
+                id: 'building',
+                type: deck.GeoJsonLayer,
+                data: buildingData,
+                filled: true,
+                extruded: true,
+                pointType: "circle",
+                // lineWidthScale: 20,
+                lineWidthMinPixels: 2,
+                getFillColor: [100, 200, 200],
+                getLineColor: (d) => [150, 150, 10],
+                getPointRadius: 5,
+                getLineWidth: 1,
+                getElevation: 100,
+
+
+            });
+
+            map.addLayer(myDeckLayer)
+
+        }
+
+
+    </script>
+
+</body>
+
+</html>

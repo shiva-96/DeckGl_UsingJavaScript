@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arc Layer On Map</title>
+
+    <!-- Mapbox installation -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css' rel='stylesheet' />
+
+    <!-- Deck.gl installation -->
+    <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
+
+    <!-- Axios installation -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+    <div id="map" style="width:100vw; height:100vh"></div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic2hpdmE2NSIsImEiOiJjbDJyamN6NnoyejkxM2ZvN3d2cHBuaTdvIn0.xWIl2m0q8i7HB-PuVuVWgQ';
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/satellite-streets-v9',
+            center: [-77.64140546321867, 43.22323026683437],
+            zoom: 15,
+            maxZoom: 21,
+            pitch: 60,
+            antialias: 10,
+
+        });
+
+        let { MapboxLayer, ArcLayer } = deck;
+
+        map.on("load", () => {
+            axios.get("arc.json").then((res) => {
+                console.log(res);
+                const layer = new MapboxLayer({
+                    id: 'arc-layer',
+                    type: ArcLayer,
+                    data: res.data,
+                    pickable: true,
+                    getWidth: 7,
+                    getSourcePosition: d => d.source,
+                    getTargetPosition: d => d.destination,
+                    getSourceColor: d => [200, 140, 0],
+                    getTargetColor: d => [50, 140, 100],
+                    opacity: 0.95
+                });
+
+                map.addLayer(layer);
+            });
+
+
+        });
+
+    </script>
+
+</body>
+
+</html>

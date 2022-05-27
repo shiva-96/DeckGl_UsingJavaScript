@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- Mapbox dependencies -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css' rel='stylesheet' />
+
+    <!-- Deck.gl dependency -->
+    <script src="https://unpkg.com/deck.gl@^8.0.0/dist.min.js"></script>
+
+    <!-- axios dependency -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+    <div id="map" style="width: 100vw; height:100vh"></div>
+
+    <script>
+
+        let { MapboxLayer, TextLayer } = deck;
+        const aminaties = [
+            "atm",
+            "bar",
+            "bank",
+            "bus",
+            "cafe",
+            "college",
+            "restorent",
+            "school",
+            "taxi",
+            "atm",
+        ];
+
+
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic2hpdmE2NSIsImEiOiJjbDJyamN6NnoyejkxM2ZvN3d2cHBuaTdvIn0.xWIl2m0q8i7HB-PuVuVWgQ';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/satellite-streets-v9',
+            zoom: 16,
+            maxzoom: 21,
+            antialias: 10,
+            center: [-74.09124970436096,
+                40.7188878196529],
+            pitch: 60,
+            antialias: 10,
+
+        });
+        map.on("load", () => {
+            axios.get("map.geojson").then((res) => {
+                console.log(res);
+                let features = res.data.features;
+                console.log(features);
+
+                features.map((f, k) => {
+                    if (aminaties[k]) { f.properties.type = aminaties[k] };
+                });
+
+                const layer = new MapboxLayer({
+                    id: "text-layer",
+                    data: features,
+                    type: TextLayer,
+                    pickable: true,
+                    getPosition: (d) => d.geometry.coordinates,
+                    getText: (d) => d.properties.type,
+                    getSize: 25,
+                    getAngle: 0,
+                    getColor: (d) => d.color,
+
+                    getTextAnchor: 'middle',
+                    getAlignmentBaseline: 'center'
+                });
+                map.addLayer(layer);
+
+
+            });
+
+
+
+        });
+
+
+
+    </script>
+
+
+
+
+</body>
+
+</html>
